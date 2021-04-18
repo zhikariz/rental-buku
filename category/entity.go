@@ -8,6 +8,6 @@ import (
 
 type Category struct {
 	gorm.Model
-	Name  string `json:"name" gorm:"size:255"`
-	Books []book.Book
+	Name  string      `json:"name" gorm:"size:255"`
+	Books []book.Book `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

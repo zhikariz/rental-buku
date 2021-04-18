@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"rental-buku/auth"
+	"rental-buku/book"
 	"rental-buku/category"
 	"rental-buku/handler"
 	"rental-buku/helper"
@@ -34,22 +35,25 @@ func main() {
 
 	for _, seed := range seeds.All() {
 		if err := seed.Run(db); err != nil {
-			log.Fatalf("Running seed '%s', failed with error: %s", seed.Name, err)
+			log.Printf("Running seed '%s', failed with error: %s", seed.Name, err)
 		}
 	}
 
 	// Repository
 	userRepository := user.NewRepository(db)
 	categoryRepository := category.NewRepository(db)
+	bookRepository := book.NewRepository(db)
 
 	// Service
 	authService := auth.NewService()
 	userService := user.NewService(userRepository)
 	categoryService := category.NewService(categoryRepository)
+	bookService := book.NewService(bookRepository)
 
 	// Handler
 	userHandler := handler.NewUserHandler(userService, authService)
 	categoryHandler := handler.NewCategoryHandler(categoryService, authService)
+	bookHandler := handler.NewBookHandler(bookService, authService)
 
 	api := router.Group("/api/v1")
 
@@ -62,6 +66,12 @@ func main() {
 	api.POST("/categories", authMiddleware(authService, userService), categoryHandler.CreateCategory)
 	api.PUT("/categories/:id", authMiddleware(authService, userService), categoryHandler.UpdateCategory)
 	api.DELETE("/categories/:id", authMiddleware(authService, userService), categoryHandler.DeleteCategory)
+
+	api.GET("/books", bookHandler.GetBooks)
+	api.GET("/books/:id", bookHandler.GetBookById)
+	api.POST("/books", authMiddleware(authService, userService), bookHandler.CreateBook)
+	api.PUT("/books/:id", authMiddleware(authService, userService), bookHandler.UpdateBook)
+	api.DELETE("/books/:id", authMiddleware(authService, userService), bookHandler.DeleteBook)
 
 	router.Use(cors.Default())
 

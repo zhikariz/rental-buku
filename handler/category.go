@@ -51,7 +51,7 @@ func (h *categoryHandler) CreateCategory(c *gin.Context) {
 	}
 
 	formatter := category.FormatCategory(newCategory)
-	response := helper.APIResponse("Category has been created !", http.StatusOK, "succes", formatter)
+	response := helper.APIResponse("Category has been created !", http.StatusOK, "success", formatter)
 
 	c.JSON(http.StatusOK, response)
 
@@ -92,7 +92,7 @@ func (h *categoryHandler) UpdateCategory(c *gin.Context) {
 		return
 	}
 
-	newCategory, err := h.categoryService.UpdateCategory(uri.ID, input)
+	updatedCategory, err := h.categoryService.UpdateCategory(uri.ID, input)
 
 	if err != nil {
 		response := helper.APIResponse("Update category failed !", http.StatusUnprocessableEntity, "error", nil)
@@ -100,7 +100,7 @@ func (h *categoryHandler) UpdateCategory(c *gin.Context) {
 		return
 	}
 
-	formatter := category.FormatCategory(newCategory)
+	formatter := category.FormatCategory(updatedCategory)
 	response := helper.APIResponse("Category has been updated!", http.StatusOK, "success", formatter)
 
 	c.JSON(http.StatusOK, response)
@@ -153,14 +153,14 @@ func (h *categoryHandler) DeleteCategory(c *gin.Context) {
 }
 
 func (h *categoryHandler) GetCategories(c *gin.Context) {
-	campaigns, err := h.categoryService.GetCategories()
+	categories, err := h.categoryService.GetCategories()
 	if err != nil {
 		response := helper.APIResponse("Get categories failed !", http.StatusUnprocessableEntity, "error", nil)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.APIResponse("List of category", http.StatusOK, "success", campaigns)
+	response := helper.APIResponse("List of category", http.StatusOK, "success", categories)
 	c.JSON(http.StatusOK, response)
 	return
 
@@ -177,13 +177,13 @@ func (h *categoryHandler) GetCategoryById(c *gin.Context) {
 		return
 	}
 
-	campaign, err := h.categoryService.GetCategoryById(uri.ID)
+	category, err := h.categoryService.GetCategoryById(uri.ID)
 	if err != nil {
 		response := helper.APIResponse("Get category failed !", http.StatusUnprocessableEntity, "error", nil)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
-	response := helper.APIResponse("Detail category", http.StatusOK, "success", campaign)
+	response := helper.APIResponse("Detail category", http.StatusOK, "success", category)
 	c.JSON(http.StatusOK, response)
 }

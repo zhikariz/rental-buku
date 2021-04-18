@@ -1,6 +1,7 @@
 package seeds
 
 import (
+	"errors"
 	"rental-buku/user"
 
 	"golang.org/x/crypto/bcrypt"
@@ -8,6 +9,24 @@ import (
 )
 
 func CreateUser(db *gorm.DB, name string, address string, email string, role string) error {
+	var user user.User
+
+	err := db.Where("email = ?", email).Find(&user).Error
+
+	if err != nil {
+		return err
+	}
+
+	if user.ID > 0 {
+		return errors.New("User is exist")
+	}
+
 	passwordHash, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.MinCost)
-	return db.Create(&user.User{Name: name, Address: address, Email: email, Password: string(passwordHash), Role: role}).Error
+	user.Name = name
+	user.Address = address
+	user.Email = email
+	user.Password = string(passwordHash)
+	user.Role = role
+
+	return db.Create(&user).Error
 }
