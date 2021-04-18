@@ -11,3 +11,8 @@ type LoginUserInput struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 }
+
+type ResetPasswordInput struct {
+	Email       string `json:"email" binding:"required,email"`
+	NewPassword string `json:"password" binding:"required"`
+}

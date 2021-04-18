@@ -12,6 +12,7 @@ type Service interface {
 	Login(input LoginUserInput) (User, error)
 	SavePhoto(id int, path string) (User, error)
 	GetUserById(id int) (User, error)
+	ResetPassword(input ResetPasswordInput) (bool, error)
 }
 
 type service struct {
@@ -111,4 +112,25 @@ func (s *service) GetUserById(id int) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *service) ResetPassword(input ResetPasswordInput) (bool, error) {
+	user, err := s.repository.FindByEmail(input.Email)
+	if err != nil {
+		return false, err
+	}
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(input.NewPassword), bcrypt.MinCost)
+
+	if err != nil {
+		return false, err
+	}
+
+	user.Password = string(passwordHash)
+	_, err = s.repository.Update(user)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

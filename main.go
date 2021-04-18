@@ -60,6 +60,7 @@ func main() {
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/photos", authMiddleware(authService, userService), userHandler.UploadPhoto)
+	api.POST("/reset_password", userHandler.ResetPassword)
 
 	api.GET("/categories", categoryHandler.GetCategories)
 	api.GET("/categories/:id", categoryHandler.GetCategoryById)

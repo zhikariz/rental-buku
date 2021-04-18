@@ -146,3 +146,35 @@ func (h *userHandler) UploadPhoto(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 
 }
+
+func (h *userHandler) ResetPassword(c *gin.Context) {
+	var input user.ResetPasswordInput
+
+	err := c.ShouldBindJSON(&input)
+
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Reset password account failed !", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	_, err = h.userService.ResetPassword(input)
+	if err != nil {
+		data := gin.H{
+			"is_reset": false,
+		}
+		response := helper.APIResponse("Failed to reset password", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data := gin.H{
+		"is_reset": true,
+	}
+	response := helper.APIResponse("Password successfully changed", http.StatusOK, "success", data)
+	c.JSON(http.StatusOK, response)
+
+}
